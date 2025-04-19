@@ -1,0 +1,26 @@
+annotations:
+  artifacthub.io/changes: |-
+    - kind: changed
+      description: Update to Navidrome v0.55.2
+apiVersion: v2
+appVersion: 0.55.2
+dependencies:
+- name: common
+  repository: http://bjw-s.github.io/helm-charts/
+  version: 0.2.0
+description: Navidrome is an open source web-based music collection server and streamer
+home: https://github.com/djjudas21/charts/tree/master/charts/navidrome
+icon: https://raw.githubusercontent.com/navidrome/navidrome/master/ui/src/icons/android-icon-192x192.png
+keywords:
+- navidrome
+- music
+- streaming
+kubeVersion: '>=1.16.0-0'
+maintainers:
+- email: djjudas21@users.noreply.github.com
+  name: djjudas21
+name: navidrome
+sources:
+- https://github.com/deluan/navidrome
+- https://hub.docker.com/r/deluan/navidrome
+version: 6.7.2

@@ -1,0 +1,93 @@
+#
+# This chart inherits from a common library chart. You can check the default values/options here:
+# https://github.com/bjw-s/helm-charts/blob/4d09009bf809b2ce3c06225f61cf229e40d2c08a/charts/library/common/values.yaml
+#
+controller:
+  replicas: 1
+
+image:
+  # -- image repository
+  repository: deluan/navidrome
+  # -- image tag
+  tag: ""
+  # -- image pull policy
+  pullPolicy: IfNotPresent
+
+# -- environment variables. See [navidrome docs](https://www.navidrome.org/docs/usage/configuration-options/#environment-variables) for more details.
+# @default -- See below
+env:
+  # -- Set the container timezone
+  TZ: Asia/Ho_Chi_Minh
+  # -- Log level. Useful for troubleshooting
+  ND_LOGLEVEL: info
+  # -- How long Navidrome will wait before closing web ui idle sessions
+  ND_SESSIONTIMEOUT: 24h
+  # -- Enables transcoding configuration in the UI
+  ND_ENABLETRANSCODINGCONFIG: "true"
+  # -- Folder where your music library is stored
+  ND_MUSICFOLDER: /music
+  # -- Enable extra endpoint with Prometheus metrics
+  ND_PROMETHEUS_ENABLED: "false"
+  # -- Enable sharing
+  ND_ENABLESHARING: "false"
+
+# -- Configures service settings for the chart.
+# @default -- See values.yaml
+service:
+  main:
+    ports:
+      http:
+        port: 80
+        targetPort: 4533
+    monitor:
+      # -- Enables or disables the serviceMonitor.
+      enabled: false
+      # -- Configures the endpoints for the serviceMonitor.
+      # @default -- See values.yaml
+      endpoints:
+        - port: http
+          scheme: http
+          path: /metrics
+          interval: 1m
+          scrapeTimeout: 10s
+
+ingress:
+  # -- Enable and configure ingress settings for the chart under this key.
+  # @default -- See values.yaml
+  main:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,connect-protocol-version
+      nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+      nginx.ingress.kubernetes.io/enable-cors: 'true'
+      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+      nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+      nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+      nginx.ingress.kubernetes.io/use-regex: 'true'
+    ingressClassName: nginx
+    hosts:
+      - host: music.dev.huyvd.xyz
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: huyvd-xyz-tls
+        hosts:
+          - music.dev.huyvd.xyz
+
+# -- Configure persistence settings for the chart under this key.
+# @default -- See values.yaml
+persistence:
+  config:
+    enabled: true
+    mountPath: /data
+    storageClass: local-path
+    accessMode: ReadWriteOnce
+    size: 4Gi
+    retain: true
+  music:
+    enabled: true
+    mountPath: /music
+    existingClaim: pvc-navidrome-smb
+    subPath: music
+    retain: true
