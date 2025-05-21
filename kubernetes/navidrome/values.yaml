@@ -3,7 +3,24 @@
 # https://github.com/bjw-s/helm-charts/blob/4d09009bf809b2ce3c06225f61cf229e40d2c08a/charts/library/common/values.yaml
 #
 controller:
-  replicas: 1
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+
+# affinity:
+#   podAntiAffinity:
+#     preferredDuringSchedulingIgnoredDuringExecution: # "Preferred" thay vì "Required" để linh hoạt hơn
+#       - weight: 100
+#         podAffinityTerm:
+#           labelSelector:
+#             matchLabels:
+#               app.kubernetes.io/name: navidrome
+#           topologyKey: kubernetes.io/hostname
 
 image:
   # -- image repository
@@ -56,24 +73,24 @@ ingress:
   # @default -- See values.yaml
   main:
     enabled: true
-    annotations:
-      nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,connect-protocol-version
-      nginx.ingress.kubernetes.io/cors-allow-origin: '*'
-      nginx.ingress.kubernetes.io/enable-cors: 'true'
-      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-      nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
-      nginx.ingress.kubernetes.io/ssl-redirect: 'true'
-      nginx.ingress.kubernetes.io/use-regex: 'true'
-    ingressClassName: nginx
+    # annotations:
+    #   nginx.ingress.kubernetes.io/cors-allow-headers: DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,connect-protocol-version
+    #   nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+    #   nginx.ingress.kubernetes.io/enable-cors: 'true'
+    #   nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    #   nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+    #   nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    #   nginx.ingress.kubernetes.io/use-regex: 'true'
+    ingressClassName: traefik
     hosts:
       - host: music.dev.huyvd.xyz
         paths:
           - path: /
-            pathType: ImplementationSpecific
-    tls:
-      - secretName: huyvd-xyz-tls
-        hosts:
-          - music.dev.huyvd.xyz
+            pathType: Prefix
+    # tls:
+    #   - secretName: huyvd-xyz-tls
+    #     hosts:
+    #       - music.dev.huyvd.xyz
 
 # -- Configure persistence settings for the chart under this key.
 # @default -- See values.yaml
@@ -81,7 +98,7 @@ persistence:
   config:
     enabled: true
     mountPath: /data
-    storageClass: local-path
+    storageClass: nfs-k3s
     accessMode: ReadWriteOnce
     size: 4Gi
     retain: true

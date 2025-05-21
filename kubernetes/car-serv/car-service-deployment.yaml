@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: car-service-deployment
+  name: car-service-deployment
+  namespace: car-service
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: car-service-deployment
+  template:
+    metadata:
+      labels:
+        app: car-service-deployment
+    spec:
+      containers:
+        # - image: elroydevops/car-serv
+        - image: nginx
+          imagePullPolicy: Always
+          name: car-service
+          ports:
+            - containerPort: 80
+              name: tcp
+              protocol: TCP

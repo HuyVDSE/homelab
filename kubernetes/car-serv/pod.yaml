@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: car-service
+  namespace: car-service
+spec:
+  containers:
+  - name: car-service
+    image: elroydevops/car-serv
+    ports:
+    - containerPort: 80
